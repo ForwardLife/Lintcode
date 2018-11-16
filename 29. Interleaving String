@@ -1,0 +1,50 @@
+class Solution {
+public:
+    /**
+     * @param s1: A string
+     * @param s2: A string
+     * @param s3: A string
+     * @return: Determine whether s3 is formed by interleaving of s1 and s2
+     */
+    bool isInterleave(string &s1, string &s2, string &s3) {
+        // write your code here
+        int len1 = s1.size();
+        int len2 = s2.size();
+        int len3 = s3.size();
+        if (len1 + len2 != len3){
+            return false; 
+        }
+        if(len1 == 0 && len2 == 0 && len3 == 0){
+            return true; 
+        }
+        //state: first i (not index) from s1, first j from s2, compose firt i + j of s3, true or false
+        vector<vector<bool>> res(len1 + 1, vector<bool>(len2 + 1));
+        //transition: res[i][j] = res[i - 1][j] & (s1[i] == s3[i + j]) | res[i][j - 1] & (s1[j] == s3[i + j])
+        res[0][0] = true;
+        
+        for(int i = 0; i < len1; i++){
+            if(s3[i] == s1[i] && res[i][0]){
+               res[i + 1][0] = true;
+            } 
+        }
+        for(int i = 0; i < len2; i++){
+            if(s3[i] == s2[i] && res[0][i]){
+               res[0][i + 1] = true;
+            } 
+        }
+        /*注意这里的初始条件，如果是二维DP状态，初始化时要考虑初始f[i][0],以及f[0][j],主要看在转移方程中，f[i][0]能不能被更新，如果不能就要初始化
+        if(s3[0] == s1[0]){
+            res[1][0] = true;
+        }
+        if(s3[0] == s2[0]){
+            res[0][1] = true;
+        }
+        */
+        for(int i = 1; i <= len1; i++){
+            for(int j = 1; j <= len2; j++){
+                res[i][j] = (res[i - 1][j] && (s1[i - 1] == s3[i + j - 1])) || (res[i][j - 1] && (s2[j - 1] == s3[i + j - 1]));
+            }
+        }
+        return res[len1][len2];
+    }
+};
